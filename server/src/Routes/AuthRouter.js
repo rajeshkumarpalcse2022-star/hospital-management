@@ -195,7 +195,10 @@ router.post('/login', loginLimiter, async (req, res) => {
             return res.status(400).json({ message: 'Missing required fields' });
         }
         
-        const user = await Staff.findOne({ username }).select('+password');
+        const identifier = username.trim();
+        const user = await Staff.findOne({
+            $or: [{ username: identifier }, { email: identifier.toLowerCase() }, { email: identifier }]
+        }).select('+password');
         
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
